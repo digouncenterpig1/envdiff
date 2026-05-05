@@ -49,3 +49,31 @@ def parse_env_file(path: str) -> Dict[str, Optional[str]]:
                 )
 
     return result
+
+
+def parse_env_string(text: str) -> Dict[str, Optional[str]]:
+    """
+    Parse a string containing .env-formatted content and return a dict of key -> value.
+
+    Useful for parsing env content that isn't stored on disk (e.g. from an API
+    or environment variable). Follows the same rules as parse_env_file.
+    """
+    result: Dict[str, Optional[str]] = {}
+
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        line = line.rstrip("\n")
+
+        if COMMENT_RE.match(line) or BLANK_RE.match(line):
+            continue
+
+        match = KEY_VALUE_RE.match(line)
+        if match:
+            key = match.group(1)
+            value = _strip_quotes(match.group(2).strip())
+            result[key] = value if value != "" else None
+        else:
+            raise ValueError(
+                f"Invalid line {lineno} in env string: {line!r}"
+            )
+
+    return result
