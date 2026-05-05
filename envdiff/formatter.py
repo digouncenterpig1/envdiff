@@ -73,9 +73,15 @@ def format_result(
     base_name: str = "base",
     target_name: str = "target",
 ) -> str:
-    """Dispatch to the appropriate formatter."""
+    """Dispatch to the appropriate formatter.
+
+    Raises:
+        ValueError: If an unsupported format is provided.
+    """
     if fmt == "json":
         return format_json(result, base_name, target_name)
     if fmt == "csv":
         return format_csv(result, base_name, target_name)
-    return format_text(result, base_name, target_name)
+    if fmt == "text":
+        return format_text(result, base_name, target_name)
+    raise ValueError(f"Unsupported output format: {fmt!r}. Expected one of: 'text', 'json', 'csv'.")
