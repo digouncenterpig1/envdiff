@@ -69,3 +69,18 @@ def test_text_with_color_does_not_crash():
     multi = _multi([("t1", "A=1\nB=2\n")])
     out = format_multi_diff_text(multi, use_color=True)
     assert "C" in out
+
+
+def test_json_multiple_targets():
+    """Ensure comparisons list has one entry per target when multiple are given."""
+    targets = [("t1", "A=1\nB=2\n"), ("t2", BASE + "D=4\n"), ("t3", BASE)]
+    multi = _multi(targets)
+    data = json.loads(format_multi_diff_json(multi))
+    assert len(data["comparisons"]) == 3
+    names = [c["target"] for c in data["comparisons"]]
+    assert names == ["t1", "t2", "t3"]
+    # t3 is identical to base — all diff lists should be empty
+    t3 = data["comparisons"][2]
+    assert t3["missing_in_target"] == []
+    assert t3["missing_in_base"] == []
+    assert t3["mismatches"] == {}
