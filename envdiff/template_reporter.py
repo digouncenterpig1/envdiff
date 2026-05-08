@@ -39,16 +39,40 @@ def format_template_json(template: EnvTemplate) -> str:
     return json.dumps(data, indent=2)
 
 
+def format_template_markdown(template: EnvTemplate) -> str:
+    """Render the template as a Markdown table."""
+    lines: list[str] = []
+    if template.source:
+        lines.append(f"## Template: `{template.source}`\n")
+    else:
+        lines.append("## Template\n")
+    lines.append("| Key | Placeholder |")
+    lines.append("|-----|-------------|")
+    for key in template.keys:
+        placeholder = template.placeholders.get(key, "") or ""
+        lines.append(f"| `{key}` | `{placeholder}` |")
+    return "\n".join(lines) + "\n"
+
+
 def print_template_report(
     template: EnvTemplate,
     fmt: str = "text",
     color: bool = True,
     dest: Optional[object] = None,
 ) -> None:
-    """Print a template report to stdout (or a given file object)."""
+    """Print a template report to stdout (or a given file object).
+
+    Args:
+        template: The EnvTemplate to report on.
+        fmt: Output format — one of ``"text"``, ``"json"``, or ``"markdown"``.
+        color: Whether to use ANSI color codes (only applies to text format).
+        dest: File-like object to write to; defaults to ``sys.stdout``.
+    """
     import sys
     out = dest or sys.stdout
     if fmt == "json":
         print(format_template_json(template), file=out)
+    elif fmt == "markdown":
+        print(format_template_markdown(template), file=out)
     else:
         print(format_template_text(template, color=color), file=out)
