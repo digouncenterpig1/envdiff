@@ -32,6 +32,12 @@ class HealthScore:
             return "D"
         return "F"
 
+    def summary(self) -> str:
+        """Return a human-readable summary of the health score."""
+        lines = [f"[{self.grade}] {self.source}: {self.score}/100"]
+        lines.extend(f"  - {note}" for note in self.notes)
+        return "\n".join(lines)
+
 
 def score_env(
     source: str,
