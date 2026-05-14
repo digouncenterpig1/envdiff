@@ -73,3 +73,10 @@ def test_print_summary_report_json(dirty_summary):
     print_summary_report(dirty_summary, fmt="json", out=buf)
     data = json.loads(buf.getvalue())
     assert "total_issues" in data
+
+
+def test_print_summary_report_invalid_fmt(dirty_summary):
+    """Passing an unsupported format should raise a ValueError."""
+    buf = io.StringIO()
+    with pytest.raises(ValueError, match="fmt"):
+        print_summary_report(dirty_summary, fmt="xml", out=buf)
